@@ -17,9 +17,38 @@ channel_utils contains class Channel made to send a message via the channel of t
 
 - ```send``` : takes ```chanInput``` (a sequence of float as input) and outputs the result produced by the channel
 - ```sendFile``` : takes ```fileName``` (the path to the file) and outputs the result produced by the channel
+- ```serialize``` : takes ```channel_input``` (the string to input to the channel) and output a version of the string that go through the channel
+- ```deserialize``` : takes ```channel_output``` (takes a list of item $\in \{-1, 1\}$) and outputs the strings to which it corresponds
 
-### Example :
+## Example :
 
+#### (De)serialization :
+
+```python
+import channel_utils as cu
+
+ser = cu.serialize("Hello World !")
+print(f"Serialized version : {ser}")
+
+des = cu.deserialize(ser)
+print(f"Deserialized version : {des}")
+```
+
+should print :
+
+```
+Serialized version : [-1  1 -1 -1  1 -1 -1 -1 -1  1  1 -1 -1  1 -1  1 -1  1  1 -1  1  1 -1 -1
+ -1  1  1 -1  1  1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1  1 -1 -1 -1 -1 -1
+ -1  1 -1  1 -1  1  1  1 -1  1  1 -1  1  1  1  1 -1  1  1  1 -1 -1  1 -1
+ -1  1  1 -1  1  1 -1 -1 -1  1  1 -1 -1  1 -1 -1 -1 -1  1 -1 -1 -1 -1 -1
+ -1 -1  1 -1 -1 -1 -1  1]
+Deserialized version : Hello World !
+
+```
+
+
+
+#### Channel usuage :
 ```python
 from channel_utils import Channel
 channel = Channel(changingIndex=True, verbose=True)
