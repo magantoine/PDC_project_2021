@@ -1,7 +1,9 @@
 # PDC_project_2021
 
 channel_utils contains class Channel made to send a message via the channel of the exercise (only for test part, later use, the client given on moodle).
+## Utils function :
 
+- ```saveFile``` : takes ```fileName``` (name of the file to save) and ```array``` (the array to write)
 ## Channel doc :
 
 ### parameters:
@@ -14,6 +16,7 @@ channel_utils contains class Channel made to send a message via the channel of t
 ### functions :
 
 - ```send``` : takes ```chanInput``` (a sequence of float as input) and outputs the result produced by the channel
+- ```sendFile``` : takes ```fileName``` (the path to the file) and outputs the result produced by the channel
 
 ### Example :
 
