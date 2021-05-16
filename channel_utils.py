@@ -11,7 +11,7 @@ class Channel:
         self.changingIndex = changingIndex
         self.verbose = verbose
 
-    def send(self, chanInput):
+    def send(self, chanInput, noise_variance=10):
         erasedIndex = 0
         if(self.changingIndex) :
             erasedIndex = np.random.randint(3)
@@ -21,12 +21,16 @@ class Channel:
         chanInput[erasedIndex:len(chanInput):3] = 0 ## erased 1 bit out of 4
 
         print(f"Channel sending with H value {erasedIndex} :\n{chanInput}")
-        return chanInput + np.sqrt(10) * np.random.randn(len(chanInput))
+        return chanInput + np.sqrt(noise_variance) * np.random.randn(len(chanInput))
 
     def sendFile(self, fileName):
         chanInput = np.loadtxt(fileName)
         return self.send(chanInput)
-
+    
+    def sendFileWithOutput(self, inputFileName, outputFileName):
+        chanInput = np.loadtxt(inputFileName)
+        noisy_values = self.send(chanInput)
+        np.savetxt(outputFileName, noisy_values)
     
 def save_file(fileName, array):
     np.savetxt(fileName, array)
