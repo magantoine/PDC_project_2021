@@ -2,10 +2,17 @@ import numpy as np
 
 class Decoder:
 
-    def __init__(self, input_file, output_file, verbose=False):
+    def __init__(self, input_file, output_file, n, verbose=False):
         self.input_file = input_file
         self.output_file = output_file
         self.verbose = verbose
+        self.n = n
+    
+    def euclidean_distance(self, x, y):
+        x = np.array(x)
+        y = np.array(y)
+        p = np.sum((x - y)**2)
+        return np.sqrt(p)
     
     def bits_to_bytes(self, bits_array):
         done = False
@@ -24,24 +31,30 @@ class Decoder:
     
     # Reads array of floats and decodes them into integers (from the Alphabet)
     def decode_values(self, values):
-        return list(map(lambda val : int(val), values))
-    
-    # Reads array of integers (from the Alphabet) and transforms them to bits
-    def values_to_bits(self, values, block_size=1):
-        return values
+        decoded_values = []
+        # Guess the erased index
+        J = np.argmin(np.array([np.sum(values[::3]**2), np.sum(values[1::3]**2), np.sum(values[2::3]**2)]))
+        
+        values = np.delete(values, np.arange(J, values.size, 3))
+        
+        for x in zip(*[iter(values)]*self.n):
+            d1 = self.euclidean_distance(list(x), np.full(shape=self.n, fill_value=1, dtype=np.int))
+            d2 = self.euclidean_distance(list(x), np.full(shape=self.n, fill_value=-1, dtype=np.int))
+            decoded_values.append(1 if d1 <= d2 else 0)
+        if self.verbose:
+            print(f'Decoded values : {decoded_values}\n')
+        return decoded_values
     
     def decode(self):
         # Read raw values from file
         values_array = np.loadtxt(self.input_file)
         # Decode the values
         decoded_values = self.decode_values(values_array)
-        # Transform the decoded values to a bit array
-        bits_array = self.values_to_bits(decoded_values)
         # Transform the bit array to bytes
-        byte_array = bytearray(self.bits_to_bytes(bits_array))
+        byte_array = bytearray(self.bits_to_bytes(decoded_values))
         
-        if self.verbose:
-            print(byte_array)
+        # if self.verbose:
+        print(byte_array)
         f = open(self.output_file, 'w+b')
         f.write(byte_array)
         f.close()
