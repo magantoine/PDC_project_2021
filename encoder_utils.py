@@ -12,7 +12,7 @@ class Encoder:
         self.N = generator_matrix.shape[0] # N is the number of output bits per input bit
         self.L = generator_matrix.shape[1] # L is the number of previous bits used when encoding (b_{i-L} ... b_{i-1})
     
-    def repetition_encoding(self, array, nb_repetitions=3):
+    def repetition_encoding(self, array, nb_repetitions=2):
         """
         Apply a repetition code to the input array
         """
@@ -47,7 +47,7 @@ class Encoder:
             print(f.read())
         plus_minus_array = bits_to_plus_minus_one(bits_array) # maps the bits {1 -> +1, 0 -> -1}
         convolved = self.convolutional_encoding(plus_minus_array) # Compute the convolutional code
-        repeated = self.repetition_encoding(convolved, nb_repetitions=3) # Apply the repetition code to mitigate the erased index
+        repeated = self.repetition_encoding(convolved, nb_repetitions=2) # Apply the repetition code to mitigate the erased index
         np.savetxt(self.output_file, repeated)
         print(f'Total number of bits used : {len(repeated)}')
 

@@ -22,7 +22,7 @@ class Decoder:
             print(f'Erased index is J = {J}')
         return J
     
-    def compactify_values(self, values, J):
+    def compactify_values_3_repet(self, values, J):
         """
         Removes the values at index J and output the mean of the remaining 2 values
         Note that instead of throwing one of the bits away, taking the mean makes sure that the output value has only
@@ -32,6 +32,25 @@ class Decoder:
         values = np.delete(values, np.arange(J, values.size, 3)) # Delete 1 value out of 3 at multiples of the J index
         for x,y in zip(*[iter(values)]*2):
             compact_values.append((x+y)/2.) # Take the mean of the remaining 2 values (this reduces variance)
+        return compact_values
+    
+    def compactify_values_2_repet(self, values, J):
+        """
+        Removes the values at index J and compactify the remaining values
+        Some bits are single and others are duplicated (1/3 of the bits is duplicated).
+        If a bit a duplicted we take the mean of the two copies as this reduces the noise variance for this bit.
+        """
+        compact_values = []
+        i = 0
+        for x,y in zip(*[iter(values)]*2):
+            if i % 3 == J:
+                compact_values.append(y) # x has been deleted so we output y
+            elif (i+1) % 3 == J:
+                compact_values.append(x) # y has been deleted so we output x
+            else:
+                compact_values.append((x+y)/2.) # Take the mean of the 2 values if none of them has been deleted
+            i += 2
+        print(f'Compact_values_length : {len(compact_values)}')
         return compact_values
     
     def generate_dico(self, n):
@@ -69,7 +88,7 @@ class Decoder:
         """
         Classical Viterbi decoding algorithm
         A key difference is that we don't pad with a final ending sequence of 1's when we finish, 
-        we simply look for the state with the highest metric on the last depth with we finish processing all Y's.
+        we simply look for the state with the highest metric on the last depth when we finish processing all Y's.
         """
         dico = self.generate_dico(self.L) # Compute the output values of the state diagram
         if len(values) % self.N != 0:
@@ -134,7 +153,7 @@ class Decoder:
                 final_entry = active_entry
                             
         # Backtrack
-        # Once we have the 
+        # Once we have the final state, we follow teh backpointers until the orignal state at depth 0
         decoded_values = []
         while idx > 0:
             final_entry_int = plus_minus_string_to_int(final_entry) # Transform state to int to be used as index
@@ -149,7 +168,7 @@ class Decoder:
     def decode_values(self, values):
         decoded_values = []
         J = self.guess_J(values)
-        values = self.compactify_values(values, J) # get rid of the deleted bits and merge the 2 remaining ones
+        values = self.compactify_values_2_repet(values, J) # get rid of the deleted bits and merge the 2 remaining ones
         
         #At this stage we got rid of the repetition code
         # We now need to decode using Viterbi
