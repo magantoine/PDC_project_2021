@@ -42,7 +42,7 @@ class Encoder:
         """
         Encode the input sequence for sending to the noisy channel
         """
-        bits_array = file_to_bits(self.input_file, little_endian=False) # Read file and get a bit array
+        bits_array = file_to_bits(self.input_file, little_endian=False, verbose=self.verbose) # Read file and get a bit array
         with open(self.input_file) as f:
             print(f.read())
         plus_minus_array = bits_to_plus_minus_one(bits_array) # maps the bits {1 -> +1, 0 -> -1}
@@ -52,15 +52,14 @@ class Encoder:
         print(f'Total number of bits used : {len(repeated)}')
 
         
-def file_to_bits(filename, little_endian=True, verbose=True):
+def file_to_bits(filename, little_endian=True, verbose=False):
     """
     Convert input file to bit array
     """
     bits = []
     with open(filename, 'rb') as f:
         bytes = f.read()
-        if verbose:
-            print(f'Original file : {bytes}\n')
+        print(f'Original file : {bytes}\n')
         for b in bytes:
             for i in range(8):
                 bits.append((b >> i) & 1 if little_endian else (b >> (7 - i)) & 1)
