@@ -94,7 +94,6 @@ class Decoder:
         if len(values) % self.N != 0:
             print(f'Corrupted values of length {len(values)}. Should be a multiple of {self.N}')
         nb_trellis_sections = int(len(values)/self.N)
-        print(f'nb_trellis_sections : {nb_trellis_sections}')
         
         # Viterbi trellis dimensions :
         height = 2**(self.L-1)
@@ -192,6 +191,7 @@ class Decoder:
         f = open(self.output_file, 'w+b')
         f.write(byte_array)
         f.close()
+        return byte_array
 
 def bits_to_bytes(bits_array):
     """
