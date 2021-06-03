@@ -160,8 +160,10 @@ class Decoder:
             decoded_values.append((0 if decoded_val == -1 else 1))
             final_entry = trellis_backpointers[final_entry_int, idx] # We go to the state on previous depth
             idx -= 1
-            
-        return list(reversed(decoded_values)) # Need to reverse since we traversed the trellis backwards
+        
+        # Need to reverse since we traversed the trellis backwards
+        # We discard the last byte since we send one extra byte when transmitting
+        return list(reversed(decoded_values))[:-8]
     
     # Reads array of floats and decodes them into bits
     def decode_values(self, values):

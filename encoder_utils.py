@@ -46,6 +46,7 @@ class Encoder:
         if self.verbose:
             with open(self.input_file) as f:
                 print(f.read())
+        bits_array.extend([1] * 8) # We add one extra byte (that we discard after decoding) since we noticed almost all decoding errors happen at the last byte
         plus_minus_array = bits_to_plus_minus_one(bits_array) # maps the bits {1 -> +1, 0 -> -1}
         convolved = self.convolutional_encoding(plus_minus_array) # Compute the convolutional code
         repeated = self.repetition_encoding(convolved, nb_repetitions=2) # Apply the repetition code to mitigate the erased index
@@ -66,7 +67,7 @@ def file_to_bits(filename, little_endian=True, verbose=False):
                 bits.append((b >> i) & 1 if little_endian else (b >> (7 - i)) & 1)
         if verbose:
             print(f'Bits array : {bits}\n')
-        return np.array(bits)
+        return bits
             
 def bits_to_plus_minus_one(bits_array):
     """
